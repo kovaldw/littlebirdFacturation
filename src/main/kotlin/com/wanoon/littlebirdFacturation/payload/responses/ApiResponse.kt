@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 class ApiResponse(
         var success:Boolean = false,
-        var message:String = ""
+        var message:String = "",
+        var result:Any? = null
 ) {
 }
