@@ -6,6 +6,8 @@ import com.wanoon.littlebirdFacturation.model.Societe
 import com.wanoon.littlebirdFacturation.repository.AnnexeRepository
 import com.wanoon.littlebirdFacturation.repository.AnnexeSpecifications
 import com.wanoon.littlebirdFacturation.repository.SocieteRepository
+import com.wanoon.littlebirdFacturation.security.model.User
+import com.wanoon.littlebirdFacturation.security.services.UserServices
 import com.wanoon.littlebirdFacturation.services.AnnexeServices
 import com.wanoon.littlebirdFacturation.services.SocieteServices
 import com.wanoon.payload.responses.ApiResponse
@@ -22,7 +24,10 @@ import org.springframework.data.jpa.domain.Specification.where
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.*
 import javax.servlet.http.HttpServletRequest
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 @RestController
@@ -30,6 +35,9 @@ import javax.servlet.http.HttpServletRequest
 @Api(description = "Ce controller gere les annexes des societes")
 class AnnexeController
 {
+
+    @Autowired
+    lateinit var userServices:UserServices
 
     @Autowired
     lateinit var societeRepository: SocieteRepository
@@ -52,7 +60,7 @@ class AnnexeController
         var annexes:MutableList<Annexe> = ArrayList()
         try
         {
-            annexes = annexeRepository.findAll()
+            annexes = annexeRepository.findAll(AnnexeSpecifications.isNotDeleted())
             return ResponseEntity.ok(ApiResponse(true, "OK", annexes))
         }
         catch (e:Exception)
@@ -70,7 +78,7 @@ class AnnexeController
     {
 
         try {
-            var annexe = annexeRepository.findByIdOrNull(id)
+            var annexe = annexeRepository.findOneByIdAndDeletedFalse(id)
 
             if (annexe == null)
             {
@@ -97,14 +105,21 @@ class AnnexeController
     {
         try
         {
-            var annexe: Annexe? = annexeRepository.findByIdOrNull(id)
+            var annexe: Annexe? = annexeRepository.findOneByIdAndDeletedFalse(id)
 
             if (annexe == null)
             {
                 return ResponseEntity.ok(ApiResponse(false, "L'annexe a suppprimer nexiste pas"));
             }
 
-            annexeRepository.delete(annexe)
+            var user: User? = userServices.getCurrentUser()
+            annexe.deleted = true
+            annexe.deletedAt = Date()
+            annexe.deletedBy = user
+
+            annexeRepository.save(annexe)
+
+//            annexeRepository.delete(annexe)
 
             return ResponseEntity.ok(ApiResponse(true, "Annexe supprimee avec succes"))
 
@@ -132,12 +147,12 @@ class AnnexeController
             {
                 return ResponseEntity.ok(ApiResponse(message = "Veuillez renseigner la societe"))
             }
-            var societe = societeRepository.findByIdOrNull(societeId)
+            var societe = societeRepository.findOneByIdAndDeletedFalse(societeId)
             if (societe == null) {
                 return ResponseEntity.ok(ApiResponse(message = "Societe introuvable"))
             }
 
-            if (annexeRepository.existsByEmailAndSociete(annexeRequest.email, societe))
+            if (annexeRepository.existsByEmailAndSocieteAndDeletedFalse(annexeRequest.email, societe))
             {
                 return ResponseEntity.ok(ApiResponse(message = "Une annexe avec le meme mail existe deja"))
             }
@@ -160,6 +175,9 @@ class AnnexeController
             annexe.VAT = annexeRequest.VAT
             annexe.address = annexeRequest.address
 
+            var user: User? = userServices.getCurrentUser()
+            annexe.createdBy = user
+
             annexeRepository.save(annexe)
             return ResponseEntity.ok(ApiResponse(true, "Annexe enregistré avec success", annexe.id))
 
@@ -178,7 +196,7 @@ class AnnexeController
     {
         try
         {
-            var oldAnnexe = annexeRepository.findByIdOrNull(id)
+            var oldAnnexe = annexeRepository.findOneByIdAndDeletedFalse(id)
             if (oldAnnexe == null)
             {
                 return ResponseEntity.ok(ApiResponse(message = "Annexe à modifier introuvable"))
@@ -193,12 +211,12 @@ class AnnexeController
             {
                 return ResponseEntity.ok(ApiResponse(message = "Veuillez renseigner la societe"))
             }
-            var societe = societeRepository.findByIdOrNull(societeId)
+            var societe = societeRepository.findOneByIdAndDeletedFalse(societeId)
             if (societe == null) {
                 return ResponseEntity.ok(ApiResponse(message = "Societe introuvable"))
             }
 
-            var annexeExiste = annexeRepository.findOneByEmailAndSociete(annexeRequest.email, societe)
+            var annexeExiste = annexeRepository.findOneByEmailAndSocieteAndDeletedFalse(annexeRequest.email, societe)
 //            logger.error(annexeExiste!!.id.toString())
 //            return ResponseEntity.ok("ok");
 
@@ -239,6 +257,11 @@ class AnnexeController
             oldAnnexe.VAT = annexeRequest.VAT
             oldAnnexe.address = annexeRequest.address
 
+            var user: User? = userServices.getCurrentUser()
+
+            oldAnnexe.updatedAt = Date()
+            oldAnnexe.updatedBy = user
+
             annexeRepository.save(oldAnnexe)
             return ResponseEntity.ok(ApiResponse(true, "Annexe modifiee avec success", oldAnnexe.id))        }
         catch (e:Exception)
@@ -277,8 +300,8 @@ class AnnexeController
             if (parameters.containsKey("societe"))
             {
                 societeFromRequest = true
-                societe = societeRepository.findByIdOrNull(parameters["societe"].toString().toLong())
-                if (societe != null) logger.error(societe.id.toString())
+                societe = societeRepository.findOneByIdAndDeletedFalse(parameters["societe"].toString().toLong())
+//                if (societe != null) logger.error(societe.id.toString())
             }
             if (parameters.containsKey("accountName"))
             {
@@ -306,6 +329,7 @@ class AnnexeController
                         ?.and(AnnexeSpecifications.withSociete(societe, societeFromRequest))
                         ?.and(AnnexeSpecifications.likeAccountName(accountName, accountNameFromRequest))
                         ?.and(AnnexeSpecifications.likeEmail(email, emailFromRequest))
+                        ?.and(AnnexeSpecifications.isNotDeleted())
             , pageable)
             return ResponseEntity.ok(annexes)
 

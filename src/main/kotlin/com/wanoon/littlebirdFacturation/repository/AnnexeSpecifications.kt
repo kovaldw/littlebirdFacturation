@@ -15,6 +15,21 @@ class AnnexeSpecifications
 
     companion object
     {
+
+        fun isNotDeleted(deleted:Boolean?=false): Specification<Annexe>? {
+            return object : Specification<Annexe>
+            {
+                //                override fun toPredicate(p0: Root<Annexe>, p1: CriteriaQuery<*>, p2: CriteriaBuilder): Predicate? {
+//                    p0.get<Annexe>("")
+//                }
+                override fun toPredicate(root: Root<Annexe>, query: CriteriaQuery<*>, builder: CriteriaBuilder): Predicate
+                {
+                    return builder.equal( root.get<Annexe>("deleted"), deleted )
+                }
+            }
+        }
+
+
         fun isBillingAddress(isBillingAddress:Boolean?): Specification<Annexe>? {
             return object : Specification<Annexe>
             {

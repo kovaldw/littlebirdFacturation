@@ -1,5 +1,7 @@
 package com.wanoon.littlebirdFacturation.model
 
+import com.wanoon.littlebirdFacturation.security.model.User
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -40,7 +42,24 @@ class Annexe (
         var isBillingAddress: Boolean = false,
 
         @ManyToOne
-        var societe: Societe? = null
+        var societe: Societe? = null,
+
+        var createdAt: Date = Date(),
+
+        @ManyToOne
+        var createdBy: User? = null,
+
+        var updatedAt: Date = Date(),
+
+        @ManyToOne
+        var updatedBy: User? = null,
+
+        var deleted:Boolean = false,
+
+        var deletedAt: Date? = null,
+
+        @ManyToOne
+        var deletedBy: User? = null
 )
 {
 

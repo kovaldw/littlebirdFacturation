@@ -9,8 +9,10 @@ import java.util.*
 import java.util.stream.Collectors
 
 open class UserPrincipal(
-        val id: Long?,
+        var id: Long?,
+
         var name:String,
+
         private val username:String,
 
         @JsonIgnore

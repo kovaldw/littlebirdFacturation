@@ -27,10 +27,16 @@ interface AnnexeRepository : JpaRepository<Annexe, Long>, JpaSpecificationExecut
     }
 
     fun existsByEmailAndSociete(email:String, societe: Societe):Boolean
+    fun existsByEmailAndSocieteAndDeletedFalse(email:String, societe: Societe):Boolean
+
     fun findOneByEmailAndSociete(email:String, societe: Societe):Annexe?
+    fun findOneByEmailAndSocieteAndDeletedFalse(email:String, societe: Societe):Annexe?
+
+    fun findOneByIdAndDeletedFalse(id:Long):Annexe?
 
 
-//    fun findByIsBillingAddress(isBillingAddres:Boolean):ArrayList<Annexe>
+
+    //    fun findByIsBillingAddress(isBillingAddres:Boolean):ArrayList<Annexe>
     fun findByIsBillingAddressAndSociete(isBillingAddres:Boolean, societe: Societe):ArrayList<Annexe>
 
 //    @Query("SELECT a FROM Annexe " +
