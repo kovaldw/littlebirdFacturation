@@ -1,13 +1,8 @@
-package com.wanoon.littlebirdFacturation.model
+import com.wanoon.littlebirdFacturation.model.Societe
+import javax.persistence.Column
+import javax.persistence.ManyToOne
 
-import javax.persistence.*
-
-@Entity
-class Annexe (
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id:Long? = null,
-
+class NewAnnexeRequest(
         var accountName:String = "",
 
         var country:String = "",
@@ -24,7 +19,6 @@ class Annexe (
 
         var bankSwift:String = "",
 
-        @Column(length = 300)
         var email:String = "",
 
         var website:String = "",
@@ -40,7 +34,7 @@ class Annexe (
         var isBillingAddress: Boolean = false,
 
         @ManyToOne
-        var societe: Societe? = null
+        var societeId: Long? = 0
 )
 {
 

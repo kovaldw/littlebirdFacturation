@@ -3,7 +3,7 @@ package com.wanoon.littlebirdFacturation.security.extensions
 const val AUTH_LOGIN_URL: String = "/api/authenticate"
 
 const val JWT_SECRET = "TOKENSECRETDOITETRESUPERIEURA512BITSOHQUECESTLONGDEPLUSILNECOMPTEPASLESESPACESOHLALALALALA"
-const val JWT_EXPIRE_IN = 604800000
+const val JWT_EXPIRE_IN = 86400000
 
 // JWT token defaults
 const val TOKEN_HEADER = "Authorization"

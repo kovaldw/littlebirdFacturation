@@ -1,14 +1,27 @@
 package com.wanoon.littlebirdFacturation.model
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class Societe (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id:Long? = null
+        var id:Long? = null,
+
+        var name:String = "",
+
+        @Column(columnDefinition = "Text")
+        var url:String = "",
+
+        var registrationNumber:String = "",
+
+        var favoriteNumber:String = "",
+
+        var termPayment:Int = 0,
+
+        var type:String = "",
+
+        var address:String = ""
+
 ) {
 }

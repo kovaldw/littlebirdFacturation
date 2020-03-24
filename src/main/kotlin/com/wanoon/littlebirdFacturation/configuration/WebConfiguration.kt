@@ -107,10 +107,10 @@ class WebConfiguration : WebSecurityConfigurerAdapter() {
                         .permitAll()
                     .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
                         .permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**")
-                        .permitAll()
-                    .anyRequest()
-                        .authenticated()
+                .antMatchers("/**/swagger-resources/**", "/swagger-ui.html", "/v2/api-docs", "/webjars/**")
+                    .permitAll()
+                .anyRequest()
+                    .authenticated()
 
         //On ajoute le filtre de jwt
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
