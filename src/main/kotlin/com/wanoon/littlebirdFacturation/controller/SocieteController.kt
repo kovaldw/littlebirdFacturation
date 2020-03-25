@@ -1,6 +1,7 @@
 package com.wanoon.littlebirdFacturation.controller
 
 import com.wanoon.littlebirdFacturation.model.Societe
+import com.wanoon.littlebirdFacturation.payload.requests.societe.NewSocieteRequest
 import com.wanoon.littlebirdFacturation.repository.SocieteRepository
 import com.wanoon.littlebirdFacturation.repository.SocieteSpecifications
 import com.wanoon.littlebirdFacturation.security.authentication.UserPrincipal
@@ -13,6 +14,8 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification.where
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
@@ -20,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 import kotlin.collections.ArrayList
 
 
@@ -44,15 +48,20 @@ class SocieteController
 
     @ApiOperation(value = "Récupère la liste des societés", notes = "Permet de récupérer toute la liste des sociétés")
     @GetMapping("/")
-    fun list():ResponseEntity<Any>
+    fun list(request:HttpServletRequest):ResponseEntity<Any>
     {
-
-        var societes:MutableList<Societe> = ArrayList()
         try
         {
+            val parameters = apiServices.getParametersFromGetRequest(request.parameterMap)
 
-            societes = societeRepository.findAll(SocieteSpecifications.isNotDeleted())
-            return ResponseEntity.ok(ApiResponse(true, "OK", societes))
+            var numeroPage:Int = apiServices.getNumeroPageFromParameters(parameters)
+            var nombreElements:Int = apiServices.getNbElementsFromParameters(parameters)
+
+            var pageable: Pageable = PageRequest.of(numeroPage, nombreElements)
+
+            var societes = societeRepository.findAll(SocieteSpecifications.isNotDeleted(), pageable)
+
+            return ResponseEntity.ok(societes)
         }
         catch (e:Exception)
         {
@@ -77,7 +86,7 @@ class SocieteController
                 return ResponseEntity.ok(ApiResponse(message = "Societe introuvable"))
             }
 
-            return ResponseEntity.ok(ApiResponse(true, "OK", societe))
+            return ResponseEntity.ok(societe)
 
         }
         catch (e:Exception)
@@ -126,18 +135,27 @@ class SocieteController
 
     @ApiOperation(value = "Enregistrement d'une nouvelle societe")
     @PostMapping("/")
-    fun new(@RequestBody @ApiParam(value = "Instance de la societe", name = "societe", required = true) societe:Societe):ResponseEntity<Any>
+    fun new(@RequestBody @ApiParam(value = "Instance de la societe", name = "societe", required = true) societeRequest:NewSocieteRequest):ResponseEntity<Any>
     {
         try {
-            if (!societeServices.validerSociete(societe))
+            if (!societeServices.validerSociete(societeRequest))
             {
                 return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations envoyees"))
             }
 
-            if (societeRepository.existsByRegistrationNumberAndDeletedFalse(societe.registrationNumber))
+            if (societeRepository.existsByRegistrationNumberAndDeletedFalse(societeRequest.registrationNumber))
             {
                 return ResponseEntity.ok(ApiResponse(message = "Une societe du meme numero de registre existe deja"))
             }
+
+            var societe = Societe()
+            societe.address = societeRequest.address.trim()
+            societe.favoriteNumber = societeRequest.favoriteNumber.trim()
+            societe.name = societeRequest.name.trim()
+            societe.registrationNumber = societeRequest.registrationNumber.trim()
+            societe.termPayment = societeRequest.termPayment
+            societe.type = societeRequest.type
+            societe.url = societeRequest.url
 
             var user: User? = userServices.getCurrentUser()
             societe.createdBy = user
@@ -156,35 +174,43 @@ class SocieteController
     @PutMapping("/{id}")
     fun edit(@PathVariable @ApiParam(value = "Id de la societe a modifier", name = "id", required = true) id:Long,
              @RequestBody @ApiParam(value = "Instance de la nouvelle societe", name = "societe", required = true
-             ) societe:Societe):ResponseEntity<Any>
+             ) societeRequest: NewSocieteRequest):ResponseEntity<Any>
     {
         try {
 
-            var oldSociete = societeRepository.findOneByIdAndDeletedFalse(id)
-            if (oldSociete == null)
+            var societe = societeRepository.findOneByIdAndDeletedFalse(id)
+            if (societe == null)
             {
                 return ResponseEntity.ok(ApiResponse(message = "Societe à modifier introuvable"))
             }
 
-            if (!societeServices.validerSociete(societe))
+            if (!societeServices.validerSociete(societeRequest))
             {
                 return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations envoyees"))
             }
 
-            var societeExiste = societeRepository.findOneByRegistrationNumberAndDeletedFalse(societe.registrationNumber)
-            if (societeExiste != null && societeExiste.registrationNumber !== oldSociete.registrationNumber)
+            var societeExiste = societeRepository.findOneByRegistrationNumberAndDeletedFalse(societeRequest.registrationNumber)
+            if (societeExiste != null && societeExiste.registrationNumber !== societe.registrationNumber)
             {
                 return ResponseEntity.ok(ApiResponse(message = "Une societe du meme numero de registre existe deja"))
             }
 
-            var user: User? = userServices.getCurrentUser()
-            var newSociete = societeServices.setSociete(oldSociete, societe)
+            societe.address = societeRequest.address.trim()
+            societe.favoriteNumber = societeRequest.address.trim()
+            societe.name = societeRequest.name.trim()
+            societe.registrationNumber = societeRequest.registrationNumber.trim()
+            societe.termPayment = societeRequest.termPayment
+            societe.type = societeRequest.type.trim()
+            societe.url = societeRequest.url.trim()
 
-            newSociete.updatedAt = Date()
-            newSociete.updatedBy = user
+            var user = userServices.getCurrentUser()
 
-            societeRepository.save(newSociete)
-            return ResponseEntity.ok(ApiResponse(true, "Societe modifiee avec success", societe.id))
+            societe.updatedAt = Date()
+            societe.updatedBy = user
+
+            societeRepository.save(societe)
+
+            return ResponseEntity.ok(societe)
 
         }
         catch (e:Exception)

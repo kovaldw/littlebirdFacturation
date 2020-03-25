@@ -5,32 +5,21 @@ import java.math.BigDecimal
 import java.util.*
 import javax.persistence.*
 
-
 @Entity
-class LigneFacturation (
+class Product (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id:Long? = null,
+
+        var productCode:String = "",
 
         var description:String = "",
 
         var price:BigDecimal = BigDecimal(0),
 
-        var quantite:Long = 0,
+        var gazoil:BigDecimal = BigDecimal(0),
 
-        var extratFuel:BigDecimal = BigDecimal(0),
-
-        var vat:BigDecimal = BigDecimal(0),
-
-        var extraMile:BigDecimal = BigDecimal(0),
-
-        var extraWeight:BigDecimal = BigDecimal(0),
-
-        var finalPrice:BigDecimal = BigDecimal(0),
-
-        var type:String = "",
-
-        var colisId:Long = 0,
+        var vat:Boolean = false,
 
         var createdAt: Date = Date(),
 
@@ -50,5 +39,4 @@ class LigneFacturation (
         var deletedBy: User? = null
 )
 {
-
 }

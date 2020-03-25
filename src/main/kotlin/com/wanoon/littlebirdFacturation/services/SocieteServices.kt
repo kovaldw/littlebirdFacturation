@@ -1,6 +1,7 @@
 package com.wanoon.littlebirdFacturation.services
 
 import com.wanoon.littlebirdFacturation.model.Societe
+import com.wanoon.littlebirdFacturation.payload.requests.societe.NewSocieteRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -13,7 +14,7 @@ class SocieteServices {
         return SocieteServices()
     }
 
-    fun validerSociete(societe: Societe):Boolean
+    fun validerSociete(societe: NewSocieteRequest):Boolean
     {
 
 
@@ -56,15 +57,15 @@ class SocieteServices {
     }
 
 
-    fun setSociete(oldSociete: Societe, newSociete: Societe):Societe
+    fun setSociete(oldSociete: Societe, newSociete: NewSocieteRequest):Societe
     {
-        oldSociete.address = newSociete.address
-        oldSociete.favoriteNumber = newSociete.address
-        oldSociete.name = newSociete.name
-        oldSociete.registrationNumber = newSociete.registrationNumber
+        oldSociete.address = newSociete.address.trim()
+        oldSociete.favoriteNumber = newSociete.address.trim()
+        oldSociete.name = newSociete.name.trim()
+        oldSociete.registrationNumber = newSociete.registrationNumber.trim()
         oldSociete.termPayment = newSociete.termPayment
-        oldSociete.type = newSociete.type
-        oldSociete.url = newSociete.url
+        oldSociete.type = newSociete.type.trim()
+        oldSociete.url = newSociete.url.trim()
 
         return oldSociete
     }

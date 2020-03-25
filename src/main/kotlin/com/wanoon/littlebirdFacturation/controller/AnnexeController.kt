@@ -9,6 +9,7 @@ import com.wanoon.littlebirdFacturation.repository.SocieteRepository
 import com.wanoon.littlebirdFacturation.security.model.User
 import com.wanoon.littlebirdFacturation.security.services.UserServices
 import com.wanoon.littlebirdFacturation.services.AnnexeServices
+import com.wanoon.littlebirdFacturation.services.ApiServices
 import com.wanoon.littlebirdFacturation.services.SocieteServices
 import com.wanoon.payload.responses.ApiResponse
 import io.swagger.annotations.Api
@@ -37,6 +38,9 @@ class AnnexeController
 {
 
     @Autowired
+    lateinit var apiServices: ApiServices
+
+    @Autowired
     lateinit var userServices:UserServices
 
     @Autowired
@@ -55,13 +59,21 @@ class AnnexeController
 
     @ApiOperation(value = "Récupère la liste des annexes", notes = "Permet de récupérer toute la liste des annexes")
     @GetMapping("/")
-    fun list():ResponseEntity<Any>
+    fun list(request: HttpServletRequest):ResponseEntity<Any>
     {
-        var annexes:MutableList<Annexe> = ArrayList()
+
         try
         {
-            annexes = annexeRepository.findAll(AnnexeSpecifications.isNotDeleted())
-            return ResponseEntity.ok(ApiResponse(true, "OK", annexes))
+            val parameters = apiServices.getParametersFromGetRequest(request.parameterMap)
+
+            var numeroPage:Int = apiServices.getNumeroPageFromParameters(parameters)
+            var nombreElements:Int = apiServices.getNbElementsFromParameters(parameters)
+
+            var pageable:Pageable = PageRequest.of(numeroPage, nombreElements)
+
+            var annexes = annexeRepository.findAll(AnnexeSpecifications.isNotDeleted(), pageable)
+
+            return ResponseEntity.ok(annexes)
         }
         catch (e:Exception)
         {
@@ -85,7 +97,7 @@ class AnnexeController
                 return ResponseEntity.ok(ApiResponse(message = "Annexe introuvable"))
             }
 
-            return ResponseEntity.ok(ApiResponse(true, "OK", annexe))
+            return ResponseEntity.ok(annexe)
 
         }
         catch (e:Exception)
@@ -263,7 +275,7 @@ class AnnexeController
             oldAnnexe.updatedBy = user
 
             annexeRepository.save(oldAnnexe)
-            return ResponseEntity.ok(ApiResponse(true, "Annexe modifiee avec success", oldAnnexe.id))        }
+            return ResponseEntity.ok(oldAnnexe)        }
         catch (e:Exception)
         {
             return ResponseEntity.ok(ApiResponse(message = e.message.toString()))
@@ -279,13 +291,7 @@ class AnnexeController
 
         try
         {
-            var parameters = HashMap<String, Any>()
-            var filtresSent = request.parameterMap
-
-            for (filtre in filtresSent)
-            {
-                parameters[filtre.key] = filtre.value[0]
-            }
+            var parameters = apiServices.getParametersFromGetRequest(request.parameterMap)
 
             var isBillingAddres:Boolean? = true; var accountName:String? = null; var email:String? = null
             var societe:Societe? = null;
@@ -314,14 +320,8 @@ class AnnexeController
                 emailFromRequest = true
             }
 
-            var numeroPage:Int = 0
-            var nombreElements:Int = 3
-            if (parameters.containsKey("page")) numeroPage = parameters["page"].toString().toInt()
-            if (parameters.containsKey("nbElements")) nombreElements = parameters["nbElements"].toString().toInt()
-
-            logger.error("page $numeroPage")
-            logger.error("nbElements $nombreElements")
-
+            var numeroPage:Int = apiServices.getNumeroPageFromParameters(parameters)
+            var nombreElements:Int = apiServices.getNbElementsFromParameters(parameters)
             var pageable:Pageable = PageRequest.of(numeroPage, nombreElements)
 
             var annexes = annexeRepository.findAll(
@@ -331,13 +331,9 @@ class AnnexeController
                         ?.and(AnnexeSpecifications.likeEmail(email, emailFromRequest))
                         ?.and(AnnexeSpecifications.isNotDeleted())
             , pageable)
+
             return ResponseEntity.ok(annexes)
 
-
-//        for (filtre in filtresSent)
-//        {
-//            parameters[filtre.key] = filtre.value[0]
-//        }
 
         }
         catch (e:Exception)
