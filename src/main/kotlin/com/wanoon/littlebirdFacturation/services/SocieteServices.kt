@@ -14,46 +14,74 @@ class SocieteServices {
         return SocieteServices()
     }
 
-    fun validerSociete(societe: NewSocieteRequest):Boolean
+    fun validerSociete(societe: NewSocieteRequest):MutableMap<String, Any>
     {
+        var resultat = mutableMapOf<String, Any>()
+        var valid = true; var message = "OK"
 
 
         try {
-            if (societe.address == null || societe.address == "")
+            if (societe.address == null || societe.address.trim() == "")
             {
-                return false
+                valid = false; message = "Address vide ou nul"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
-            if (societe.favoriteNumber == null || societe.favoriteNumber == "")
+            if (societe.favoriteNumber == null || societe.favoriteNumber.trim() == "")
             {
-                return false
+                valid = false; message = "FavoriteNumber est vide ou nul"
+                resultat["valid"] = valid; resultat["message"] = message;
+                return resultat
+//                return false
             }
-            if (societe.name == null || societe.name == "")
+            if (societe.name == null || societe.name.trim() == "")
             {
-                return false
+                valid = false; message = "Name es vide ou nul"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
-            if (societe.registrationNumber == null || societe.registrationNumber == "")
+            if (societe.registrationNumber == null || societe.registrationNumber.trim() == "")
             {
-                return false
+                valid = false; message = "RegistrationNumber est vide ou nul"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
             if (societe.termPayment == null || societe.termPayment == 0)
             {
-                return false
+                valid = false; message = "TermPayment est null ou vide"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
-            if (societe.type == null || societe.type == "")
+            if (societe.type == null || societe.type.trim() == "")
             {
-                return false
+                valid = false; message = "Type est null ou vide"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
-            if (societe.url == null || societe.url == "")
+            if (societe.url == null || societe.url.trim() == "")
             {
-                return false
+                valid = false; message = "Url est null ou vide"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
         }
         catch (e:Exception)
         {
-            return false
+            valid = false; message = "Erreur: ${e.message.toString()}"
+            resultat["valid"] = valid; resultat["message"] = message
+            return resultat
+//            return false
         }
 
-        return true
+        resultat["valid"] = valid; resultat["message"] = message
+        return resultat
+//        return true
     }
 
 

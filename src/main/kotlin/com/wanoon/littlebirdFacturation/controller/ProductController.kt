@@ -45,7 +45,7 @@ class ProductController
     {
         try
         {
-            val parameters = apiServices.getParametersFromGetRequest(request.parameterMap)
+            val parameters = apiServices.getParametersFromGetRequest(request)
 
             var numeroPage:Int = apiServices.getNumeroPageFromParameters(parameters)
             var nombreElements:Int = apiServices.getNbElementsFromParameters(parameters)
@@ -120,9 +120,10 @@ class ProductController
 
         try
         {
-            if (!productServices.validerProductRequest(productRequest))
+            val validationRequest = productServices.validerProductRequest(productRequest)
+            if (validationRequest["valid"] == false)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations invoyees"))
+                return ResponseEntity.ok(ApiResponse(message = validationRequest["message"].toString()))
             }
 
             if (productRepository.existsByProductCodeAndDeletedFalse(productRequest.productCode))
@@ -130,8 +131,8 @@ class ProductController
                 return ResponseEntity.ok(ApiResponse(message = "Un produit du meme code existe deja"))
             }
 
-            var product = Product(description = productRequest.description, gazoil = productRequest.gazoil,
-                price = productRequest.price, productCode = productRequest.productCode, vat = productRequest.vat)
+            var product = Product(description = productRequest.description.trim(), gazoil = productRequest.gazoil,
+                price = productRequest.price, productCode = productRequest.productCode.trim(), vat = productRequest.vat)
 
             val user = userServices.getCurrentUser()
             product.createdBy = user
@@ -165,9 +166,10 @@ class ProductController
                 return ResponseEntity.ok(ApiResponse(message = "Produit à modifier introuvable"))
             }
 
-            if (!productServices.validerProductRequest(productRequest))
+            val validationRequest = productServices.validerProductRequest(productRequest)
+            if (validationRequest["valid"] == false)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations envoyées"))
+                return ResponseEntity.ok(ApiResponse(message = validationRequest["message"].toString()))
             }
 
             var productExiste = productRepository.findOneByProductCodeAndDeletedFalse(productRequest.productCode)
@@ -178,9 +180,9 @@ class ProductController
 
             val user = userServices.getCurrentUser()
 
-            product.description = productRequest.description
+            product.description = productRequest.description.trim()
             product.gazoil = productRequest.gazoil
-            product.productCode = productRequest.productCode
+            product.productCode = productRequest.productCode.trim()
             product.price = productRequest.price
             product.vat = productRequest.vat
 

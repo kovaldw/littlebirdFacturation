@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import com.wanoon.littlebirdFacturation.extensions.DEBUT_PAGE
 import com.wanoon.littlebirdFacturation.extensions.NB_ELEMENTS_PAR_PAGE
+import javax.servlet.http.HttpServletRequest
 
 
 @Configuration
@@ -16,8 +17,9 @@ class ApiServices
         return ApiServices()
     }
 
-    fun getParametersFromGetRequest(queryMap: MutableMap<String, Array<String>>): HashMap<String, String>
+    fun getParametersFromGetRequest(request: HttpServletRequest): HashMap<String, String>
     {
+        var queryMap = request.parameterMap
         var finalParameters = HashMap<String, String>()
         try {
             for (element in queryMap)

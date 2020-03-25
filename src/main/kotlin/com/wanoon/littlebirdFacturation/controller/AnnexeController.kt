@@ -64,7 +64,7 @@ class AnnexeController
 
         try
         {
-            val parameters = apiServices.getParametersFromGetRequest(request.parameterMap)
+            val parameters = apiServices.getParametersFromGetRequest(request)
 
             var numeroPage:Int = apiServices.getNumeroPageFromParameters(parameters)
             var nombreElements:Int = apiServices.getNbElementsFromParameters(parameters)
@@ -150,9 +150,10 @@ class AnnexeController
     {
         try
         {
-            if (!annexeServices.validerAnnexeRequest(annexeRequest))
+            val validationRequest = annexeServices.validerAnnexeRequest(annexeRequest)
+            if (validationRequest["valid"] == false)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations envoyees"))
+                return ResponseEntity.ok(ApiResponse(message = validationRequest["message"].toString()))
             }
             var societeId = annexeRequest.societeId
             if (societeId == null)
@@ -171,21 +172,21 @@ class AnnexeController
 
             var annexe = Annexe()
             annexe.societe = societe
-            annexe.zipCode = annexeRequest.zipCode
-            annexe.website = annexeRequest.website
-            annexe.tel = annexeRequest.tel
-            annexe.language = annexeRequest.language
+            annexe.zipCode = annexeRequest.zipCode.trim()
+            annexe.website = annexeRequest.website.trim()
+            annexe.tel = annexeRequest.tel.trim()
+            annexe.language = annexeRequest.language.trim()
             annexe.isBillingAddress = annexeRequest.isBillingAddress
-            annexe.iban = annexeRequest.iban
-            annexe.email = annexeRequest.email
-            annexe.defaultContact = annexeRequest.defaultContact
-            annexe.currency = annexeRequest.currency
-            annexe.country = annexeRequest.country
-            annexe.city = annexeRequest.city
-            annexe.bankSwift = annexeRequest.bankSwift
-            annexe.accountName = annexeRequest.accountName
-            annexe.VAT = annexeRequest.VAT
-            annexe.address = annexeRequest.address
+            annexe.iban = annexeRequest.iban.trim()
+            annexe.email = annexeRequest.email.trim()
+            annexe.defaultContact = annexeRequest.defaultContact.trim()
+            annexe.currency = annexeRequest.currency.trim()
+            annexe.country = annexeRequest.country.trim()
+            annexe.city = annexeRequest.city.trim()
+            annexe.bankSwift = annexeRequest.bankSwift.trim()
+            annexe.accountName = annexeRequest.accountName.trim()
+            annexe.VAT = annexeRequest.VAT.trim()
+            annexe.address = annexeRequest.address.trim()
 
             var user: User? = userServices.getCurrentUser()
             annexe.createdBy = user
@@ -214,9 +215,10 @@ class AnnexeController
                 return ResponseEntity.ok(ApiResponse(message = "Annexe à modifier introuvable"))
             }
 
-            if (!annexeServices.validerAnnexeRequest(annexeRequest))
+            val validationRequest = annexeServices.validerAnnexeRequest(annexeRequest)
+            if (validationRequest["valid"] == false)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations envoyees"))
+                return ResponseEntity.ok(ApiResponse(message = validationRequest["message"].toString()))
             }
             var societeId = annexeRequest.societeId
             if (societeId == null)
@@ -253,21 +255,21 @@ class AnnexeController
 
 
             oldAnnexe.societe = societe
-            oldAnnexe.zipCode = annexeRequest.zipCode
-            oldAnnexe.website = annexeRequest.website
-            oldAnnexe.tel = annexeRequest.tel
-            oldAnnexe.language = annexeRequest.language
+            oldAnnexe.zipCode = annexeRequest.zipCode.trim()
+            oldAnnexe.website = annexeRequest.website.trim()
+            oldAnnexe.tel = annexeRequest.tel.trim()
+            oldAnnexe.language = annexeRequest.language.trim()
             oldAnnexe.isBillingAddress = annexeRequest.isBillingAddress
-            oldAnnexe.iban = annexeRequest.iban
-            oldAnnexe.email = annexeRequest.email
-            oldAnnexe.defaultContact = annexeRequest.defaultContact
-            oldAnnexe.currency = annexeRequest.currency
-            oldAnnexe.country = annexeRequest.country
-            oldAnnexe.city = annexeRequest.city
-            oldAnnexe.bankSwift = annexeRequest.bankSwift
-            oldAnnexe.accountName = annexeRequest.accountName
-            oldAnnexe.VAT = annexeRequest.VAT
-            oldAnnexe.address = annexeRequest.address
+            oldAnnexe.iban = annexeRequest.iban.trim()
+            oldAnnexe.email = annexeRequest.email.trim()
+            oldAnnexe.defaultContact = annexeRequest.defaultContact.trim()
+            oldAnnexe.currency = annexeRequest.currency.trim()
+            oldAnnexe.country = annexeRequest.country.trim()
+            oldAnnexe.city = annexeRequest.city.trim()
+            oldAnnexe.bankSwift = annexeRequest.bankSwift.trim()
+            oldAnnexe.accountName = annexeRequest.accountName.trim()
+            oldAnnexe.VAT = annexeRequest.VAT.trim()
+            oldAnnexe.address = annexeRequest.address.trim()
 
             var user: User? = userServices.getCurrentUser()
 
@@ -291,7 +293,7 @@ class AnnexeController
 
         try
         {
-            var parameters = apiServices.getParametersFromGetRequest(request.parameterMap)
+            var parameters = apiServices.getParametersFromGetRequest(request)
 
             var isBillingAddres:Boolean? = true; var accountName:String? = null; var email:String? = null
             var societe:Societe? = null;

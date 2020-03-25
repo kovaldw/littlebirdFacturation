@@ -16,37 +16,60 @@ class AnnexeServices
         return AnnexeServices()
     }
 
-    fun validerAnnexeRequest(annexe: NewAnnexeRequest):Boolean
+    fun validerAnnexeRequest(annexe: NewAnnexeRequest):MutableMap<String, Any>
     {
 
+        var resultat = mutableMapOf<String, Any>()
+        var valid = true; var message = "Ok"
         try {
-            if (annexe.accountName == null || annexe.accountName == "")
+            if (annexe.accountName == null || annexe.accountName.trim() == "")
             {
-                return false
+                valid = false; message = "AccountName est vie ou null"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
-            if (annexe.email == null || annexe.email == "")
+            if (annexe.email == null || annexe.email.trim() == "")
             {
-                return false
+                valid = false; message = "Email est vide ou null"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
-            if (annexe.defaultContact == null || annexe.defaultContact == "")
+            if (annexe.defaultContact == null || annexe.defaultContact.trim() == "")
             {
-                return false
+                valid = false; message = "DefaultContact est null ou vide"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
-            if (annexe.tel == null || annexe.tel == "")
+            if (annexe.tel == null || annexe.tel.trim() == "")
             {
-                return false
+                valid = false; message = "Tel est vide ou nul"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
             if (annexe.societeId == null)
             {
-                return false
+                valid = false; message = "Societe est vide ou null"
+                resultat["valid"] = valid; resultat["message"] = message
+                return resultat
+//                return false
             }
         }
         catch (e:Exception)
         {
-            return false
+            valid = false; message = "Erreur: ${e.message.toString()}"
+            resultat["valid"] = valid; resultat["message"] = message
+            return resultat
+//            return false
         }
 
-        return true
+        resultat["valid"] = valid; resultat["message"] = message
+        return resultat
+
+//        return true
     }
 
     fun setAnnexe(oldAnnexe: Annexe, newAnnexe: Annexe): Annexe

@@ -17,6 +17,8 @@ class Facture (
 
         var amount:BigDecimal = BigDecimal(0),
 
+        var amountTTC:BigDecimal = BigDecimal(0),
+
         var filePath:String = "",
 
         var type:String = "",

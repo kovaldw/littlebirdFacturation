@@ -52,7 +52,7 @@ class SocieteController
     {
         try
         {
-            val parameters = apiServices.getParametersFromGetRequest(request.parameterMap)
+            val parameters = apiServices.getParametersFromGetRequest(request)
 
             var numeroPage:Int = apiServices.getNumeroPageFromParameters(parameters)
             var nombreElements:Int = apiServices.getNbElementsFromParameters(parameters)
@@ -138,9 +138,11 @@ class SocieteController
     fun new(@RequestBody @ApiParam(value = "Instance de la societe", name = "societe", required = true) societeRequest:NewSocieteRequest):ResponseEntity<Any>
     {
         try {
-            if (!societeServices.validerSociete(societeRequest))
+
+            val validationRequest = societeServices.validerSociete(societeRequest)
+            if (validationRequest["valid"] == false)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations envoyees"))
+                return ResponseEntity.ok(ApiResponse(message = validationRequest["message"].toString()))
             }
 
             if (societeRepository.existsByRegistrationNumberAndDeletedFalse(societeRequest.registrationNumber))
@@ -184,9 +186,10 @@ class SocieteController
                 return ResponseEntity.ok(ApiResponse(message = "Societe à modifier introuvable"))
             }
 
-            if (!societeServices.validerSociete(societeRequest))
+            val validationRequest = societeServices.validerSociete(societeRequest)
+            if (validationRequest["valid"] == false)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez vérifier les informations envoyees"))
+                return ResponseEntity.ok(ApiResponse(message = validationRequest["message"].toString()))
             }
 
             var societeExiste = societeRepository.findOneByRegistrationNumberAndDeletedFalse(societeRequest.registrationNumber)

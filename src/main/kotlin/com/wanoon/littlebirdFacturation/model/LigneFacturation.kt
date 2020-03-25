@@ -35,6 +35,9 @@ class LigneFacturation (
         var createdAt: Date = Date(),
 
         @ManyToOne
+        var facture: Facture?,
+
+        @ManyToOne
         var createdBy: User? = null,
 
         var updatedAt: Date = Date(),
