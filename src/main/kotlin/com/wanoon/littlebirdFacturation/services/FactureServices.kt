@@ -4,12 +4,15 @@ import com.wanoon.littlebirdFacturation.model.Facture
 import com.wanoon.littlebirdFacturation.model.LigneFacturation
 import com.wanoon.littlebirdFacturation.payload.requests.facture.NewFactureRequest
 import com.wanoon.littlebirdFacturation.repository.LigneFacturationRepository
+import com.wanoon.littlebirdFacturation.security.services.UserServices
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.math.BigDecimal
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Configuration
 class FactureServices
@@ -19,6 +22,9 @@ class FactureServices
 
     @Autowired
     lateinit var ligneFacturationRepository: LigneFacturationRepository
+
+    @Autowired
+    lateinit var userServices: UserServices
 
     @Bean
     fun getInstanceFacture(): FactureServices {
@@ -201,11 +207,14 @@ class FactureServices
 
     fun setFactureForLigneFacturation(lignesFacturations: ArrayList<LigneFacturation>, facture:Facture)
     {
+        val user = userServices.getCurrentUser()
         try
         {
             for (ligneFacturation in lignesFacturations)
             {
                 ligneFacturation.facture = facture
+                ligneFacturation.updatedAt = Date()
+                ligneFacturation.updatedBy = user
                 ligneFacturationRepository.save(ligneFacturation)
             }
         }

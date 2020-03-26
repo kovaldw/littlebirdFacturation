@@ -129,11 +129,16 @@ class FactureController
     fun create(
             @ApiParam(value = "Instance de la facture à enregistrer", name = "facture", required = true)
             @RequestBody
-            factureRequest: NewFactureRequest
+            factureRequest: NewFactureRequest?
     ): ResponseEntity<Any>
     {
         try
         {
+            if (factureRequest == null)
+            {
+                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+            }
+
             val validationRequest = factureServices.validerNewFactureRequest(factureRequest)
             if (validationRequest["valid"] == false)
             {

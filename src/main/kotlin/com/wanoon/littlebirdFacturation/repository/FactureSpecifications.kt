@@ -17,6 +17,8 @@ class FactureSpecifications
                 criteriaBuilder.equal(root.get<Facture>("deleted"), deleted)
             }
         }
+
+
     }
 
 }

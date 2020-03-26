@@ -135,9 +135,15 @@ class SocieteController
 
     @ApiOperation(value = "Enregistrement d'une nouvelle societe")
     @PostMapping("/")
-    fun new(@RequestBody @ApiParam(value = "Instance de la societe", name = "societe", required = true) societeRequest:NewSocieteRequest):ResponseEntity<Any>
+    fun new(@RequestBody
+            @ApiParam(value = "Instance de la societe", name = "societe", required = true)
+            societeRequest:NewSocieteRequest?):ResponseEntity<Any>
     {
         try {
+            if (societeRequest == null)
+            {
+                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+            }
 
             val validationRequest = societeServices.validerSociete(societeRequest)
             if (validationRequest["valid"] == false)
@@ -176,9 +182,14 @@ class SocieteController
     @PutMapping("/{id}")
     fun edit(@PathVariable @ApiParam(value = "Id de la societe a modifier", name = "id", required = true) id:Long,
              @RequestBody @ApiParam(value = "Instance de la nouvelle societe", name = "societe", required = true
-             ) societeRequest: NewSocieteRequest):ResponseEntity<Any>
+             ) societeRequest: NewSocieteRequest?):ResponseEntity<Any>
     {
         try {
+
+            if (societeRequest == null)
+            {
+                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+            }
 
             var societe = societeRepository.findOneByIdAndDeletedFalse(id)
             if (societe == null)

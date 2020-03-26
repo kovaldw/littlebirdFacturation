@@ -18,7 +18,7 @@ class LigneFacturation (
 
         var quantite:Long = 0,
 
-        var extratFuel:BigDecimal = BigDecimal(0),
+        var extraFuel:BigDecimal = BigDecimal(0),
 
         var vat:BigDecimal = BigDecimal(0),
 
@@ -35,7 +35,7 @@ class LigneFacturation (
         var createdAt: Date = Date(),
 
         @ManyToOne
-        var facture: Facture?,
+        var facture: Facture? = null,
 
         @ManyToOne
         var createdBy: User? = null,

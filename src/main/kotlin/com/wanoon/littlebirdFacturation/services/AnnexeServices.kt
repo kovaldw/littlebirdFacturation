@@ -21,7 +21,9 @@ class AnnexeServices
 
         var resultat = mutableMapOf<String, Any>()
         var valid = true; var message = "Ok"
-        try {
+        try
+        {
+
             if (annexe.accountName == null || annexe.accountName.trim() == "")
             {
                 valid = false; message = "AccountName est vie ou null"

@@ -146,10 +146,17 @@ class AnnexeController
 
     @ApiOperation(value = "Enregistrement d'une nouvelle annexe")
     @PostMapping("/")
-    fun new(@RequestBody @ApiParam(value = "Instance de l'annexe", name = "annexe", required = true) annexeRequest: NewAnnexeRequest):ResponseEntity<Any>
+    fun new(@RequestBody
+            @ApiParam(value = "Instance de l'annexe", name = "annexe", required = true)
+            annexeRequest: NewAnnexeRequest?):ResponseEntity<Any>
     {
         try
         {
+            if (annexeRequest == null)
+            {
+                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+            }
+
             val validationRequest = annexeServices.validerAnnexeRequest(annexeRequest)
             if (validationRequest["valid"] == false)
             {
@@ -205,10 +212,15 @@ class AnnexeController
     @PutMapping("/{id}")
     fun edit(@PathVariable @ApiParam(value = "Id de l'annexe a modifier", name = "id", required = true) id:Long,
              @RequestBody @ApiParam(value = "Instance de la nouvelle annexe", name = "societe", required = true
-             ) annexeRequest: NewAnnexeRequest):ResponseEntity<Any>
+             ) annexeRequest: NewAnnexeRequest?):ResponseEntity<Any>
     {
         try
         {
+            if (annexeRequest == null)
+            {
+                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+            }
+
             var oldAnnexe = annexeRepository.findOneByIdAndDeletedFalse(id)
             if (oldAnnexe == null)
             {

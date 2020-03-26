@@ -115,11 +115,17 @@ class ProductController
     @ApiOperation(value = "Creation d'un produit", notes = "Permet de créer une nouvelle instance de produit")
     fun create(
             @ApiParam(value = "Instance du produit", name = "product", required = true)
-            @RequestBody productRequest: NewProductRequest):ResponseEntity<Any>
+            @RequestBody productRequest: NewProductRequest?
+    ):ResponseEntity<Any>
     {
 
         try
         {
+            if (productRequest == null)
+            {
+                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+            }
+
             val validationRequest = productServices.validerProductRequest(productRequest)
             if (validationRequest["valid"] == false)
             {
@@ -154,12 +160,17 @@ class ProductController
     fun update(
             @PathVariable id:Long,
             @ApiParam(value = "Instance du nouveau produit", name = "product", required = true)
-            @RequestBody productRequest: NewProductRequest
+            @RequestBody productRequest: NewProductRequest?
     ):ResponseEntity<Any>
     {
 
         try
         {
+            if (productRequest == null)
+            {
+                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+            }
+
             var product = productRepository.findOneByIdAndDeletedFalse(id)
             if (product == null)
             {
