@@ -1,5 +1,6 @@
 package com.wanoon.littlebirdFacturation.services
 
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Societe
 import com.wanoon.littlebirdFacturation.payload.requests.societe.NewSocieteRequest
 import org.springframework.context.annotation.Bean
@@ -24,6 +25,8 @@ class SocieteServices {
             if (societe.address == null || societe.address.trim() == "")
             {
                 valid = false; message = "Address vide ou nul"
+                var params = arrayOf("Adresse")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -31,13 +34,17 @@ class SocieteServices {
             if (societe.favoriteNumber == null || societe.favoriteNumber.trim() == "")
             {
                 valid = false; message = "FavoriteNumber est vide ou nul"
+                var params = arrayOf("FavoriteNumber")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message;
                 return resultat
 //                return false
             }
             if (societe.name == null || societe.name.trim() == "")
             {
-                valid = false; message = "Name es vide ou nul"
+                valid = false; message = "Name est vide ou nul"
+                var params = arrayOf("Name")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -45,6 +52,8 @@ class SocieteServices {
             if (societe.registrationNumber == null || societe.registrationNumber.trim() == "")
             {
                 valid = false; message = "RegistrationNumber est vide ou nul"
+                var params = arrayOf("RegistrationNumber")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -52,6 +61,8 @@ class SocieteServices {
             if (societe.termPayment == null || societe.termPayment == 0)
             {
                 valid = false; message = "TermPayment est null ou vide"
+                var params = arrayOf("TermPayment")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -59,6 +70,8 @@ class SocieteServices {
             if (societe.type == null || societe.type.trim() == "")
             {
                 valid = false; message = "Type est null ou vide"
+                var params = arrayOf("Type")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -66,6 +79,8 @@ class SocieteServices {
             if (societe.url == null || societe.url.trim() == "")
             {
                 valid = false; message = "Url est null ou vide"
+                var params = arrayOf("Url")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -74,6 +89,7 @@ class SocieteServices {
         catch (e:Exception)
         {
             valid = false; message = "Erreur: ${e.message.toString()}"
+            message = Translator.toLocale("err")
             resultat["valid"] = valid; resultat["message"] = message
             return resultat
 //            return false

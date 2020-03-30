@@ -1,5 +1,6 @@
 package com.wanoon.littlebirdFacturation.controller
 
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Facture
 import com.wanoon.littlebirdFacturation.payload.requests.facture.NewLigneFacturationRequest
 //import com.wanoon.littlebirdFacturation.payload.requests.facture.NewListeLignesFacturationsRequest
@@ -29,6 +30,9 @@ class LigneFacturationController
 {
 
     @Autowired
+    lateinit var translator: Translator
+
+    @Autowired
     lateinit var apiServices: ApiServices
 
     @Autowired
@@ -49,6 +53,7 @@ class LigneFacturationController
     fun list(reqquest:HttpServletRequest): ResponseEntity<Any>
     {
 
+//        return ResponseEntity.ok(Translator.toLocale("bonjour"))
 
         try {
             var parameters = apiServices.getParametersFromGetRequest(reqquest)
@@ -84,7 +89,7 @@ class LigneFacturationController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -102,7 +107,7 @@ class LigneFacturationController
             val ligneFacturation = ligneFacturationRepository.findOneByIdAndDeletedFalse(id)
             if (ligneFacturation == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Ligne de facturation introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("ligneFacturation.one.ligneFacturationNullError")))
             }
 
             return ResponseEntity.ok(ligneFacturation)
@@ -110,7 +115,7 @@ class LigneFacturationController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -118,7 +123,7 @@ class LigneFacturationController
     @PostMapping("/")
     @ApiOperation(value = "Enregistrer une ligne de facturation", notes = "Permet d'enregistrer une nouvelle ligne de facturation")
     fun create(
-            @ApiParam(value = "Instance de ligne de facturation", name = "ligneFacturation", required = true)
+            @ApiParam(value = "Tableau d'instance des lignes de facturation", name = "lignesFacturations", required = true)
             @RequestBody
             lignesFacturationsRequest: ArrayList<NewLigneFacturationRequest?>?
     ):ResponseEntity<Any>
@@ -127,7 +132,7 @@ class LigneFacturationController
         {
             if (lignesFacturationsRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             val resultatValidation = ligneFacturationServices.validerListeNewLignesFacturations(lignesFacturationsRequest)
@@ -140,7 +145,7 @@ class LigneFacturationController
 
             if (lignesFacturations.size.compareTo(lignesFacturationsRequest.size) != 0)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Une erreur incounnue lors du traitement des lignes de facturation"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("ligneFacturation.new.ErreurInconnue")))
             }
 
             var nbEnregistrer = 0
@@ -150,12 +155,13 @@ class LigneFacturationController
                 nbEnregistrer++
             }
 
-            return ResponseEntity.ok(ApiResponse(success = true, message = "$nbEnregistrer ligne(s) enregistrée(s) sur ${lignesFacturations.size} au total"))
+            return ResponseEntity.ok(ApiResponse(success = true, message = "$nbEnregistrer " + Translator.toLocale("ligneFacturation.new.NbLignesEnregistree")
+                    + " ${lignesFacturations.size} " + Translator.toLocale("ligneFacturation.new.NbLignesTotal")))
 
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }

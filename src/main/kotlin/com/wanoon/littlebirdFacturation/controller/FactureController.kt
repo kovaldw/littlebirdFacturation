@@ -1,5 +1,6 @@
 package com.wanoon.littlebirdFacturation.controller
 
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Facture
 import com.wanoon.littlebirdFacturation.model.LigneFacturation
 import com.wanoon.littlebirdFacturation.payload.requests.facture.NewFactureRequest
@@ -66,7 +67,7 @@ class FactureController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -81,14 +82,14 @@ class FactureController
         try
         {
             var facture: Facture? = factureRepository.findOneByIdAndDeletedFalse(id)
-                    ?: return ResponseEntity.ok(ApiResponse(message = "Facture introuvable"))
+                    ?: return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("facture.one.factureIntrouvable")))
 
             return ResponseEntity.ok(facture!!)
 
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -104,7 +105,7 @@ class FactureController
         try
         {
             var facture: Facture? = factureRepository.findOneByIdAndDeletedFalse(id)
-                    ?: return ResponseEntity.ok(ApiResponse(message = "Facture à supprimer introuvable"))
+                    ?: return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("facture.delete.factureIntrouvable")))
 
             val user = userServices.getCurrentUser()
 
@@ -114,11 +115,11 @@ class FactureController
 
             factureRepository.save(facture)
 
-            return ResponseEntity.ok(ApiResponse(success = true, message = "Facture supprimee avec success"))
+            return ResponseEntity.ok(ApiResponse(success = true, message = Translator.toLocale("facture.delete.success")))
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -136,7 +137,7 @@ class FactureController
         {
             if (factureRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             val validationRequest = factureServices.validerNewFactureRequest(factureRequest)
@@ -147,7 +148,7 @@ class FactureController
 
             if (factureRepository.existsByRefAndDeletedFalse(factureRequest.ref.trim()))
             {
-                return ResponseEntity.ok(ApiResponse(message = "Une facture du meme reference existe deja"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("facture.new.factureExisteDeja")))
             }
 
             var lignesFacturationsIds = factureRequest.lignesFacturations
@@ -157,12 +158,12 @@ class FactureController
             val montant = factureServices.calculerMontantFacture(lignesFacturations)
             if (montant == BigDecimal(0))
             {
-                return ResponseEntity.ok(ApiResponse(message = "Le montant de la facture est egal à 0"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("facture.new.montantNull")))
             }
             val montantTTC = factureServices.calculerMontantFactureTTC(lignesFacturations)
             if (montantTTC == BigDecimal(0))
             {
-                return ResponseEntity.ok(ApiResponse(message = "Le montant TTC est egal à 0"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("facture.new.montantTTCNull")))
             }
 
             var facture = Facture()
@@ -181,16 +182,13 @@ class FactureController
 
             factureServices.setFactureForLigneFacturation(lignesFacturations, facture)
 
-            return ResponseEntity.ok(ApiResponse(success = true, message = "Facture enregistree avec success", response = facture.id))
+            return ResponseEntity.ok(ApiResponse(success = true, message = Translator.toLocale("facture.new.success"), response = facture.id))
 
         }
         catch (e:Exception)
         {
-            logger.error(e.toString())
-            return ResponseEntity.ok("Erreur: ${e.message.toString()}")
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
-
-
 
     }
 

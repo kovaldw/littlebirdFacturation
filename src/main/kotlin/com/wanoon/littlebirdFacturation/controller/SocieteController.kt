@@ -1,5 +1,6 @@
 package com.wanoon.littlebirdFacturation.controller
 
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Societe
 import com.wanoon.littlebirdFacturation.payload.requests.societe.NewSocieteRequest
 import com.wanoon.littlebirdFacturation.repository.SocieteRepository
@@ -65,7 +66,7 @@ class SocieteController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(true, e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -83,7 +84,7 @@ class SocieteController
 
             if (societe == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Societe introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("societe.one.societeIntrouvable")))
             }
 
             return ResponseEntity.ok(societe)
@@ -91,7 +92,7 @@ class SocieteController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(false, e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -110,7 +111,7 @@ class SocieteController
 
             if (societe == null)
             {
-                return ResponseEntity.ok(ApiResponse(false, "La societe a suppprimer nexiste pas"));
+                return ResponseEntity.ok(ApiResponse(false, Translator.toLocale("societe.delete.societeIntrouvable")));
             }
 
             var user: User? = userServices.getCurrentUser()
@@ -122,12 +123,12 @@ class SocieteController
 
 //            societeRepository.delete(societe)
 
-            return ResponseEntity.ok(ApiResponse(true, "Societe supprimee avec succes"))
+            return ResponseEntity.ok(ApiResponse(true, Translator.toLocale("societe.delete.success")))
 
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -142,7 +143,7 @@ class SocieteController
         try {
             if (societeRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             val validationRequest = societeServices.validerSociete(societeRequest)
@@ -153,7 +154,7 @@ class SocieteController
 
             if (societeRepository.existsByRegistrationNumberAndDeletedFalse(societeRequest.registrationNumber))
             {
-                return ResponseEntity.ok(ApiResponse(message = "Une societe du meme numero de registre existe deja"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("societe.new.societeExisteDeja")))
             }
 
             var societe = Societe()
@@ -169,12 +170,12 @@ class SocieteController
             societe.createdBy = user
 
             societeRepository.save(societe)
-            return ResponseEntity.ok(ApiResponse(true, "Societe enregistree avec success", societe.id))
+            return ResponseEntity.ok(ApiResponse(true, Translator.toLocale("societe.new.success"), societe.id))
 
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -188,13 +189,13 @@ class SocieteController
 
             if (societeRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             var societe = societeRepository.findOneByIdAndDeletedFalse(id)
             if (societe == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Societe à modifier introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("societe.edit.societeIntrouvable")))
             }
 
             val validationRequest = societeServices.validerSociete(societeRequest)
@@ -206,7 +207,7 @@ class SocieteController
             var societeExiste = societeRepository.findOneByRegistrationNumberAndDeletedFalse(societeRequest.registrationNumber)
             if (societeExiste != null && societeExiste.registrationNumber !== societe.registrationNumber)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Une societe du meme numero de registre existe deja"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("societe.new.societeExisteDeja")))
             }
 
             societe.address = societeRequest.address.trim()
@@ -229,7 +230,7 @@ class SocieteController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }

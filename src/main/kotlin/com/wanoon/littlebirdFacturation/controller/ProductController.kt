@@ -1,5 +1,6 @@
 package com.wanoon.littlebirdFacturation.controller
 
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Product
 import com.wanoon.littlebirdFacturation.payload.requests.product.NewProductRequest
 import com.wanoon.littlebirdFacturation.repository.ProductRepository
@@ -59,7 +60,7 @@ class ProductController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -72,19 +73,19 @@ class ProductController
         try
         {
             var product:Product? = productRepository.findOneByIdAndDeletedFalse(id)
-                    ?: return ResponseEntity.ok(ApiResponse(message = "Produit introuvable"))
+                    ?: return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("product.one.produitNull")))
 
             return ResponseEntity.ok(product!!)
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
 
     @DeleteMapping("/{id}")
-    @ApiOperation(value = "Suppression d'un produit", notes = "Permet d supprimer un produit grace à son ID")
+    @ApiOperation(value = "Suppression d'un produit", notes = "Permet de supprimer un produit grace à son ID")
     fun delete(
             @ApiParam(value = "ID du produit à supprimer", name = "id")
             @PathVariable id:Long):ResponseEntity<Any>
@@ -92,7 +93,7 @@ class ProductController
         try
         {
             var product = productRepository.findOneByIdAndDeletedFalse(id)
-                    ?: return ResponseEntity.ok(ApiResponse(message = "Produit a supprimer introuvable"))
+                    ?: return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("product.delete.produitNull")))
 
             val user = userServices.getCurrentUser()
 
@@ -102,11 +103,11 @@ class ProductController
 
             productRepository.save(product)
 
-            return ResponseEntity.ok(ApiResponse(success = true, message = "Suppression effectuee avec succes"))
+            return ResponseEntity.ok(ApiResponse(success = true, message = Translator.toLocale("product.delete.success")))
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -123,7 +124,7 @@ class ProductController
         {
             if (productRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             val validationRequest = productServices.validerProductRequest(productRequest)
@@ -134,7 +135,7 @@ class ProductController
 
             if (productRepository.existsByProductCodeAndDeletedFalse(productRequest.productCode))
             {
-                return ResponseEntity.ok(ApiResponse(message = "Un produit du meme code existe deja"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("product.new.produitExisteDeja")))
             }
 
             var product = Product(description = productRequest.description.trim(), gazoil = productRequest.gazoil,
@@ -145,12 +146,12 @@ class ProductController
 
             productRepository.save(product)
 
-            return ResponseEntity.ok(ApiResponse(success = true, message = "produit créé avec succès", response = product.id))
+            return ResponseEntity.ok(ApiResponse(success = true, message = Translator.toLocale("product.new.success"), response = product.id))
 
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -168,13 +169,13 @@ class ProductController
         {
             if (productRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             var product = productRepository.findOneByIdAndDeletedFalse(id)
             if (product == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Produit à modifier introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("product.edit.produitIntrouvable")))
             }
 
             val validationRequest = productServices.validerProductRequest(productRequest)
@@ -186,7 +187,7 @@ class ProductController
             var productExiste = productRepository.findOneByProductCodeAndDeletedFalse(productRequest.productCode)
             if (productExiste != null && product.productCode != productExiste.productCode)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Un autre produit du meme code existe deja"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("product.new.produitExisteDeja")))
             }
 
             val user = userServices.getCurrentUser()
@@ -206,7 +207,7 @@ class ProductController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = "Erreur: ${e.message.toString()}"))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }

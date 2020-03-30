@@ -1,5 +1,6 @@
 package com.wanoon.littlebirdFacturation.services
 
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Facture
 import com.wanoon.littlebirdFacturation.model.LigneFacturation
 import com.wanoon.littlebirdFacturation.payload.requests.facture.NewFactureRequest
@@ -43,6 +44,8 @@ class FactureServices
             if (facture.billingAddress == null || facture.billingAddress.trim() == "")
             {
                 valid = false; message = "BillingAdress est vide ou nul"
+                var params = arrayOf("BillingAdress")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -50,6 +53,8 @@ class FactureServices
 
             if (facture.ref == null || facture.ref.trim() == "") {
                 valid = false; message = "Ref est null ou vide"
+                var params = arrayOf("Ref")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -58,6 +63,8 @@ class FactureServices
             if (facture.type == null || !typesFactures.contains(facture.type.trim()))
             {
                 valid = false; message = "La valeur de type est incorrect"
+//                var params = arrayOf("SocieteId")
+                message = Translator.toLocale("facture.new.typeIncorrect")
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -75,6 +82,8 @@ class FactureServices
         catch (e:Exception)
         {
             valid = false; message = "Erreur: ${e.message.toString()}"
+            message = Translator.toLocale("err")
+            resultat["valid"] = valid; resultat["message"] = message
             resultat["valid"] = valid; resultat["message"] = message
             return resultat
         }
@@ -94,6 +103,8 @@ class FactureServices
             if (lignesFacturation == null || lignesFacturation.isEmpty())
             {
                 valid = false; message = "Aucune ligne de facturation envoyee"
+                message = Translator.toLocale("facture.new.aucuneLigneFacturation")
+                resultat["valid"] = valid; resultat["message"] = message
                 resultat["valid"] = valid; resultat["message"] = message
 
                 return resultat
@@ -105,6 +116,9 @@ class FactureServices
                 {
                     valid = false
                     message = "La ligne de facturation $element est null"
+                    var params = arrayOf("$element")
+                    message = Translator.toLocale("facture.new.ligneFacturationNull", params)
+                    resultat["valid"] = valid; resultat["message"] = message
 
                     break
                 }
@@ -113,6 +127,9 @@ class FactureServices
                 {
                     valid = false
                     message = "La ligne de facuration $element n'existe pas"
+                    var params = arrayOf("$element")
+                    message = Translator.toLocale("facture.new.ligneFacturationNexistePas", params)
+                    resultat["valid"] = valid; resultat["message"] = message
 
                     break
                 }
@@ -120,13 +137,18 @@ class FactureServices
                 {
                     valid = false
                     message = "La ligne de facturation $element a déjà été facturée"
+                    var params = arrayOf("$element")
+                    message = Translator.toLocale("facture.new.ligneFacturationDejaFacturee", params)
 
                     break
                 }
 
                 if (ligneFacturation.type != facture.type)
                 {
-                    valid = false; message = "Le type de la ligne de facturation $element ne correspond pas à celui de la facture"
+                    valid = false;
+                    message = "Le type de la ligne de facturation $element ne correspond pas à celui de la facture"
+                    var params = arrayOf("$element")
+                    message = Translator.toLocale("facture.new.ligneFacturationTypeIncorrect", params)
 
                     break
                 }
@@ -134,7 +156,9 @@ class FactureServices
 
         }catch (e:Exception)
         {
-            valid = false; message = e.message.toString()
+            valid = false;
+            message = e.message.toString()
+            message = Translator.toLocale("err")
         }
 
 

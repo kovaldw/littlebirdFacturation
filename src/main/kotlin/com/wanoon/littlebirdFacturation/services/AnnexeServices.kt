@@ -1,6 +1,7 @@
 package com.wanoon.littlebirdFacturation.services
 
 import NewAnnexeRequest
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Annexe
 import com.wanoon.littlebirdFacturation.model.Societe
 import org.springframework.context.annotation.Bean
@@ -27,6 +28,9 @@ class AnnexeServices
             if (annexe.accountName == null || annexe.accountName.trim() == "")
             {
                 valid = false; message = "AccountName est vie ou null"
+                var params = arrayOf("AccountName")
+                message = Translator.toLocale("validationRequest.error", params)
+
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -34,6 +38,9 @@ class AnnexeServices
             if (annexe.email == null || annexe.email.trim() == "")
             {
                 valid = false; message = "Email est vide ou null"
+                var params = arrayOf("Email")
+                message = Translator.toLocale("validationRequest.error", params)
+
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -41,6 +48,9 @@ class AnnexeServices
             if (annexe.defaultContact == null || annexe.defaultContact.trim() == "")
             {
                 valid = false; message = "DefaultContact est null ou vide"
+                var params = arrayOf("DefaultContact")
+                message = Translator.toLocale("validationRequest.error", params)
+
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -48,6 +58,8 @@ class AnnexeServices
             if (annexe.tel == null || annexe.tel.trim() == "")
             {
                 valid = false; message = "Tel est vide ou nul"
+                var params = arrayOf("Tel")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -55,6 +67,8 @@ class AnnexeServices
             if (annexe.societeId == null)
             {
                 valid = false; message = "Societe est vide ou null"
+                var params = arrayOf("SocieteId")
+                message = Translator.toLocale("validationRequest.error", params)
                 resultat["valid"] = valid; resultat["message"] = message
                 return resultat
 //                return false
@@ -63,6 +77,7 @@ class AnnexeServices
         catch (e:Exception)
         {
             valid = false; message = "Erreur: ${e.message.toString()}"
+            message = Translator.toLocale("err")
             resultat["valid"] = valid; resultat["message"] = message
             return resultat
 //            return false

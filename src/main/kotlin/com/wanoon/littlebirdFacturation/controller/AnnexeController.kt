@@ -1,6 +1,7 @@
 package com.wanoon.littlebirdFacturation.controller
 
 import NewAnnexeRequest
+import com.wanoon.littlebirdFacturation.configuration.Translator
 import com.wanoon.littlebirdFacturation.model.Annexe
 import com.wanoon.littlebirdFacturation.model.Societe
 import com.wanoon.littlebirdFacturation.repository.AnnexeRepository
@@ -77,7 +78,7 @@ class AnnexeController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(true, e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -94,7 +95,7 @@ class AnnexeController
 
             if (annexe == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Annexe introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.one.annexeIntrouvable")))
             }
 
             return ResponseEntity.ok(annexe)
@@ -102,7 +103,7 @@ class AnnexeController
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(false, e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -121,7 +122,7 @@ class AnnexeController
 
             if (annexe == null)
             {
-                return ResponseEntity.ok(ApiResponse(false, "L'annexe a suppprimer nexiste pas"));
+                return ResponseEntity.ok(ApiResponse(false, Translator.toLocale("annexe.delete.annexeIntrouvable")));
             }
 
             var user: User? = userServices.getCurrentUser()
@@ -133,12 +134,12 @@ class AnnexeController
 
 //            annexeRepository.delete(annexe)
 
-            return ResponseEntity.ok(ApiResponse(true, "Annexe supprimee avec succes"))
+            return ResponseEntity.ok(ApiResponse(true, Translator.toLocale("annexe.delete.success")))
 
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -154,7 +155,7 @@ class AnnexeController
         {
             if (annexeRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             val validationRequest = annexeServices.validerAnnexeRequest(annexeRequest)
@@ -165,16 +166,16 @@ class AnnexeController
             var societeId = annexeRequest.societeId
             if (societeId == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez renseigner la societe"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.new.societeNonEnvoyee")))
             }
             var societe = societeRepository.findOneByIdAndDeletedFalse(societeId)
             if (societe == null) {
-                return ResponseEntity.ok(ApiResponse(message = "Societe introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.new.societeNull")))
             }
 
             if (annexeRepository.existsByEmailAndSocieteAndDeletedFalse(annexeRequest.email, societe))
             {
-                return ResponseEntity.ok(ApiResponse(message = "Une annexe avec le meme mail existe deja"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.new.annexeExisteDeja")))
             }
 
             var annexe = Annexe()
@@ -199,12 +200,12 @@ class AnnexeController
             annexe.createdBy = user
 
             annexeRepository.save(annexe)
-            return ResponseEntity.ok(ApiResponse(true, "Annexe enregistré avec success", annexe.id))
+            return ResponseEntity.ok(ApiResponse(true, Translator.toLocale("annexe.new.success"), annexe.id))
 
         }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
     }
 
@@ -218,13 +219,13 @@ class AnnexeController
         {
             if (annexeRequest == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Aucune requete envoyee. Veuillez réésayer"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("requeteEnvoyeeNulle")))
             }
 
             var oldAnnexe = annexeRepository.findOneByIdAndDeletedFalse(id)
             if (oldAnnexe == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Annexe à modifier introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.edit.annexeIntrouvable")))
             }
 
             val validationRequest = annexeServices.validerAnnexeRequest(annexeRequest)
@@ -235,11 +236,11 @@ class AnnexeController
             var societeId = annexeRequest.societeId
             if (societeId == null)
             {
-                return ResponseEntity.ok(ApiResponse(message = "Veuillez renseigner la societe"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.new.societeNonEnvoyee")))
             }
             var societe = societeRepository.findOneByIdAndDeletedFalse(societeId)
             if (societe == null) {
-                return ResponseEntity.ok(ApiResponse(message = "Societe introuvable"))
+                return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.new.societeNull")))
             }
 
             var annexeExiste = annexeRepository.findOneByEmailAndSocieteAndDeletedFalse(annexeRequest.email, societe)
@@ -258,7 +259,7 @@ class AnnexeController
 
                         if (annexeExiste.email != oldAnnexe.email)
                         {
-                            return ResponseEntity.ok(ApiResponse(message = "Une annexe de la societe avec le meme mail existe deja"))
+                            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("annexe.new.annexeExisteDeja")))
                         }
                     }
                 }
@@ -292,7 +293,7 @@ class AnnexeController
             return ResponseEntity.ok(oldAnnexe)        }
         catch (e:Exception)
         {
-            return ResponseEntity.ok(ApiResponse(message = e.message.toString()))
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
     }
@@ -352,7 +353,7 @@ class AnnexeController
         }
         catch (e:Exception)
         {
-           return ResponseEntity.ok(e.message.toString())
+            return ResponseEntity.ok(ApiResponse(message = Translator.toLocale("err") + ": ${e.message.toString()}"))
         }
 
 
